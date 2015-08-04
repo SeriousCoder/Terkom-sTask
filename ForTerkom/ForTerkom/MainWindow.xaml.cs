@@ -78,6 +78,12 @@ namespace ForTerkom
 
         private void CreateImageButton_Click(object sender, RoutedEventArgs e)
         {
+            if (Screen.Source == null)
+            {
+                MessageBox.Show("Load video");
+                return;
+            }
+
             var bmp = new RenderTargetBitmap(Screen.NaturalVideoWidth, Screen.NaturalVideoHeight, 96, 96, PixelFormats.Pbgra32);
             bmp.Render(Screen);
 
@@ -90,15 +96,39 @@ namespace ForTerkom
 
         private void NormalizeButton_Click(object sender, RoutedEventArgs e)
         {
+            if (ImageItem.Source == null)
+            {
+                MessageBox.Show("Click \"Get Image\"");
+                return;
+            }
+            try
+            {
+                _imageExt.MakeHistogramme();
+                _imageExt.Normalize();
+                ImageItem.Source = _imageExt.GetImage();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Failed normalize");
+            }
+
+        }
+
+        private void MakeHistButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ImageItem.Source == null)
+            {
+                MessageBox.Show("Click \"Get Image\"");
+                return;
+            }
             try
             {
                 _imageExt.MakeHistogramme();
             }
             catch (Exception)
             {
-                MessageBox.Show("Fail");
+                MessageBox.Show("Failed create hists");
             }
-
         }
 
     }
