@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForTerkom", "ForTerkom\ForTerkom.csproj", "{9D3ABA28-B3CD-462D-9009-733E7145698E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{97FC5A6A-3E13-4207-AF37-E1A60DEE8C4F} = {97FC5A6A-3E13-4207-AF37-E1A60DEE8C4F}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Normalize", "Normalize\Normalize.vcxproj", "{97FC5A6A-3E13-4207-AF37-E1A60DEE8C4F}"
 EndProject

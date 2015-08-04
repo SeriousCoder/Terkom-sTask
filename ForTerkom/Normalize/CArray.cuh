@@ -37,11 +37,6 @@ public:
 		return cudaPtr[row*deviceStride + column];
 	}
 
-	__device__ void SetAt(int row, int column, T value)
-	{
-		cudaPtr[row*deviceStride + column] = value;
-	}
-
 	void Dispose()
 	{
 		cudaFree(cudaPtr);

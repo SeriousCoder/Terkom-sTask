@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
-using System.Drawing;
+
 
 namespace ForTerkom
 {
@@ -23,10 +15,13 @@ namespace ForTerkom
     public partial class MainWindow : Window
     {
         private bool _firstPlay;
+        private ImageExtensions _imageExt;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            _imageExt = new ImageExtensions();
         }
 
         private void LoadButton_Click(object sender, RoutedEventArgs e)
@@ -86,7 +81,25 @@ namespace ForTerkom
             var bmp = new RenderTargetBitmap(Screen.NaturalVideoWidth, Screen.NaturalVideoHeight, 96, 96, PixelFormats.Pbgra32);
             bmp.Render(Screen);
 
-            Image.Source = bmp;
+            _imageExt.ToBitmapImage(bmp);
+
+            ImageItem.Source = bmp;
         }
+
+        
+
+        private void NormalizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _imageExt.MakeHistogramme();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Fail");
+            }
+
+        }
+
     }
 }

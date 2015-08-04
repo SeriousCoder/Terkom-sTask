@@ -16,8 +16,8 @@
         <Button x:Name="PlayButton" Content="Play" HorizontalAlignment="Left" Margin="55,35,0,0" VerticalAlignment="Top" Width="56" Click="PlayButton_Click" Grid.Row="2"/>
         <Button x:Name="LoadButton" Content="Load" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="LoadButton_Click" Grid.Row="2"/>
         <Button x:Name="StopButton" Content="Stop" HorizontalAlignment="Left" Margin="116,35,0,0" VerticalAlignment="Top" Width="56" Grid.Row="2" Click="StopButton_Click"/>
-        <Button x:Name="NormalizeButton" Content="Normalize" HorizontalAlignment="Left" Margin="127,20,0,0" VerticalAlignment="Top" Width="75" Grid.Row="2" Grid.Column="1"/>
-        <Image x:Name="Image" Grid.Column="1" Margin="0" Grid.Row="1" Source="{Binding ElementName=Screen}" Stretch="None">
+        <Button x:Name="NormalizeButton" Content="Normalize" HorizontalAlignment="Left" Margin="127,20,0,0" VerticalAlignment="Top" Width="75" Grid.Row="2" Grid.Column="1" Click="NormalizeButton_Click"/>
+        <Image x:Name="ImageItem" Grid.Column="1" Margin="0" Grid.Row="1" Source="{Binding ElementName=Screen}" Stretch="None">
 
         </Image>
         <Button x:Name="CreateImageButton" Content="Get Image" HorizontalAlignment="Left" Margin="47,20,0,0" VerticalAlignment="Top" Width="75" Grid.Row="2" Grid.Column="1" Click="CreateImageButton_Click"/>
