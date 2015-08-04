@@ -1,0 +1,13 @@
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\bin\Debug\ForTerkom.exe.config
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\bin\Debug\ForTerkom.exe
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\bin\Debug\ForTerkom.pdb
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\ForTerkom.csprojResolveAssemblyReference.cache
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\MainWindow.baml
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\MainWindow.g.cs
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\App.g.cs
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\ForTerkom_MarkupCompile.cache
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\ForTerkom.g.resources
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\ForTerkom.Properties.Resources.resources
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\ForTerkom.csproj.GenerateResource.Cache
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\ForTerkom.exe
+c:\users\seriously\documents\visual studio 2013\Projects\ForTerkom\ForTerkom\obj\Debug\ForTerkom.pdb
