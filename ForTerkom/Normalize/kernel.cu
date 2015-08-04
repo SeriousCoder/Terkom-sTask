@@ -8,8 +8,7 @@
 
 extern "C"
 {
-	__declspec(dllexport) void CalculateHistograme(int* source, int imgWidth, int imgHeight, int* res);
-	__declspec(dllexport) void Normalize(int* image, int width, int height, int histMax, int histMin);
+	__declspec(dllexport) int* CalculateHistograme(int* source, int imgWidth, int imgHeight, int* res);
 }
 
 __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
@@ -17,7 +16,7 @@ __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
 	int column = blockIdx.x * blockDim.x + threadIdx.x;
 
 	int tempIndex = threadIdx.x;
-	int temp[32][256];
+	__shared__ int temp[32][256];
 	__shared__ int height;
 	__shared__ int width;
 
@@ -28,8 +27,7 @@ __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
 	{
 		for (int j = 0; j < height; j++)
 		{
-			int val = image.At(j, column);
-			temp[tempIndex][val]++;
+			temp[tempIndex][image.At(j, column)]++;
 		}
 	}
 
@@ -57,7 +55,7 @@ __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
 
 }
 
-void CalculateHistograme(int* image, int width, int height, int* res)
+int* CalculateHistograme(int* image, int width, int height, int* res)
 {
 	CArray<int> source = CArray<int>(image, width, height);
 
@@ -77,48 +75,14 @@ void CalculateHistograme(int* image, int width, int height, int* res)
 
 	for (int i = 1; i < gridSize.x; i++)
 	{
-		for (int j = 0; j < 256; j++)
+		for (int j = 0; j < 255; j++)
 		{
 			resHist[j] = gpu_hist[i * 256 + j];
 		}
 	}
 
-	res = resHist;
-
 	free(hist);
 	free(resHist);
-}
 
-__global__ void cudaNormalize(CArray<int> image, int histMax, int histMin)
-{
-	int column = blockIdx.x * blockDim.x + threadIdx.x;
-	int row = blockIdx.y*blockDim.y + threadIdx.y;
-
-	__shared__ int height;
-	__shared__ int width;
-	__shared__ int diffHist;
-
-	height = image.Height;
-	width = image.Width;
-	diffHist = histMax - histMin;
-
-	if (width > column && height > row)
-	{
-		int valImg = image.At(row, column);
-		int val = valImg - histMin;
-		int div = val / diffHist;
-		image.SetAt(row, column, 255 * div);
-	}
-}
-
-void Normalize(int* image, int width, int height, int histMax, int histMin)
-{
-	CArray<int> source = CArray<int>(image, width, height);
-
-	dim3 blockSize = dim3(32);
-	dim3 gridSize = dim3((height + 31) / 32);
-
-	cudaNormalize << <gridSize, blockSize >> > (source, histMax, histMin);
-
-	source.GetData(image);
+	return resHist;
 }
