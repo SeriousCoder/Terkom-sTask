@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -78,18 +79,9 @@ namespace ForTerkom
 
         private void CreateImageButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Screen.Source == null)
-            {
-                MessageBox.Show("Load video");
-                return;
-            }
+            _imageExt.ToBitmapImage(Screen);
 
-            var bmp = new RenderTargetBitmap(Screen.NaturalVideoWidth, Screen.NaturalVideoHeight, 96, 96, PixelFormats.Pbgra32);
-            bmp.Render(Screen);
-
-            _imageExt.ToBitmapImage(bmp);
-
-            ImageItem.Source = bmp;
+            ImageItem.Source = _imageExt.GetImageSource();
         }
 
         
@@ -105,7 +97,9 @@ namespace ForTerkom
             {
                 _imageExt.MakeHistogramme();
                 _imageExt.Normalize();
-                ImageItem.Source = _imageExt.GetImage();
+                ImageItem.Source = _imageExt.GetImageSource();
+
+                
             }
             catch (Exception)
             {

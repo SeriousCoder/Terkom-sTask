@@ -2,6 +2,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "CArray.cuh"
+#include "ImageLoading.cuh"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,7 +18,7 @@ __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
 	int column = blockIdx.x * blockDim.x + threadIdx.x;
 
 	int tempIndex = threadIdx.x;
-	int temp[32][256];
+	int temp[32 * 256];
 	__shared__ int height;
 	__shared__ int width;
 
@@ -29,7 +30,7 @@ __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
 		for (int j = 0; j < height; j++)
 		{
 			int val = image.At(j, column);
-			temp[tempIndex][val]++;
+			temp[tempIndex * 256 + val]++;
 		}
 	}
 
@@ -42,7 +43,7 @@ __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
 		{
 			for (int j = 0; j < 256; j++)
 			{
-				temp[tempIndex][j] += temp[tempIndex + i][j];
+				temp[tempIndex * 256 + j] += temp[(tempIndex + i) * 256 + j];
 			}
 		}
 		i /= 2;
@@ -51,7 +52,7 @@ __global__ void cudaCalculateGistograme(CArray<int> image, int* histArray)
 	{
 		for (int j = 0; j < 256; j++)
 		{
-			histArray[blockIdx.x * 256 + j] = temp[0][j];
+			histArray[blockIdx.x * 256 + j] = temp[j];
 		}
 	}
 
@@ -73,20 +74,22 @@ void CalculateHistograme(int* image, int width, int height, int* res)
 
 	cudaMemcpy(hist, gpu_hist, sizeof(int) * gridSize.x * 256, cudaMemcpyDeviceToHost);
 
-	int* resHist = (int*)malloc(sizeof(int) * 256);
-
-	for (int i = 1; i < gridSize.x; i++)
+	for (int i = 0; i < gridSize.x; i++)
 	{
 		for (int j = 0; j < 256; j++)
 		{
-			resHist[j] = gpu_hist[i * 256 + j];
+			if (i == 0)
+			{
+				res[j] = hist[i * 256 + j];
+			}
+			else
+			{
+				res[j] += hist[i * 256 + j];
+			}
 		}
 	}
 
-	res = resHist;
-
 	free(hist);
-	free(resHist);
 }
 
 __global__ void cudaNormalize(CArray<int> image, int histMax, int histMin)
@@ -122,3 +125,16 @@ void Normalize(int* image, int width, int height, int histMax, int histMin)
 
 	source.GetData(image);
 }
+
+//void main()
+//{
+//	int width;
+//		int height;
+//		char* filename = "Sample.bmp";  //Write your way to bmp file
+//		int* img = loadBmp(filename, &width, &height);
+//		int res[256];
+//		CalculateHistograme(img, width, height, res);
+//	
+//		free(res);
+//		free(img);
+//}

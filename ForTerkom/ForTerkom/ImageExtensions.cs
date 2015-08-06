@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Color = System.Drawing.Color;
@@ -40,20 +41,34 @@ namespace ForTerkom
             set { Height = value; }
         }
 
-        public void ToBitmapImage(RenderTargetBitmap source)
+        public void ToBitmapImage(UIElement source)
         {
-            var stream = new MemoryStream();
-            var bitmapEncoder = new BmpBitmapEncoder();
+            double aHeight = source.RenderSize.Height;
+            double aWidth = source.RenderSize.Width;
 
-            bitmapEncoder.Frames.Add(BitmapFrame.Create(source));
-            bitmapEncoder.Save(stream);
+            RenderTargetBitmap renderTarget = new RenderTargetBitmap((int)aWidth, (int)aHeight, 96, 96, PixelFormats.Pbgra32);
 
-            _image = new Bitmap(stream);
+            VisualBrush sourceBrush = new VisualBrush(source);
 
-            imageR = new int[Width, Height];
-            imageG = new int[Width, Height];
-            imageB = new int[Width, Height];
+            DrawingVisual drawingVisual = new DrawingVisual();
+            DrawingContext drawingContext = drawingVisual.RenderOpen();
 
+            using (drawingContext)
+            {
+                drawingContext.PushTransform(new ScaleTransform(1, 1));
+                drawingContext.DrawRectangle(sourceBrush, null, new Rect(new System.Windows.Point(0, 0), new System.Windows.Point((int)aWidth, (int)aHeight)));
+            }
+
+            renderTarget.Render(drawingVisual);
+
+            BitmapEncoder bmpEncoder = new BmpBitmapEncoder();
+            bmpEncoder.Frames.Add(BitmapFrame.Create(renderTarget));
+
+            MemoryStream sr = new MemoryStream();
+            bmpEncoder.Save(sr);
+
+            var bmp = new Bitmap(sr);
+            _image = bmp;
         }
 
         int[,] LibColors(int color)
@@ -113,7 +128,7 @@ namespace ForTerkom
             }
         }
 
-        public ImageSource GetImage()
+        public ImageSource GetImageSource()
         {
             var stream = new MemoryStream();
             
@@ -126,6 +141,11 @@ namespace ForTerkom
             newImage.EndInit();
 
             return newImage;
+        }
+
+        public Bitmap GetBitmap()
+        {
+            return _image;
         }
 
     }
