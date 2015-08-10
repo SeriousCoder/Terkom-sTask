@@ -145,7 +145,7 @@ namespace ForTerkom
             }
             try
             {
-                
+                _imageExt.MakeHistograme();
 
             }
             catch (Exception)
