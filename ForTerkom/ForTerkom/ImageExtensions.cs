@@ -19,12 +19,11 @@ namespace ForTerkom
         [DllImport("Normalize.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "CalculateHistograme")]
         public static extern void CalculateHistograme(int[,] source, int imgWidth, int imgHeight, int[] hist);
         [DllImport("Normalize.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Normalize")]
-        public static extern void Normalize(int[,] source, int imgWidth, int imgHeight, int histMax, int histMin);
+        public static extern void Normalize(int[,] source, int imgWidth, int imgHeight, int[] normalizeTable);
 
         private Bitmap _image;
-        int[] _histR = new int[256];
-        int[] _histG = new int[256];
-        int[] _histB = new int[256];
+        int[] _hist = new int[256];
+        private int[,] _imageY;
 
         private int[,] imageR;
         private int[,] imageG;
@@ -71,7 +70,7 @@ namespace ForTerkom
             _image = bmp;
         }
 
-        int[,] LibColors(int color)
+        int[,] LibColors(int switchF = 0)
         {
             var foo = new int[Width, Height];
 
@@ -79,41 +78,73 @@ namespace ForTerkom
             {
                 for (int j = 0; j < Height; j++)
                 {
-                    switch (color)
+                    switch (switchF)
                     {
+                        case 0:
+                            foo[i, j] =
+                            (int) (0.2126 * _image.GetPixel(i, j).R + 0.7152 * _image.GetPixel(i, j).G +
+                                0.0722 * _image.GetPixel(i, j).B);
+                            break;
                         case 1:
                             foo[i, j] = _image.GetPixel(i, j).R;
                             break;
                         case 2:
                             foo[i, j] = _image.GetPixel(i, j).G;
                             break;
-                        default:
+                        case 3:
                             foo[i, j] = _image.GetPixel(i, j).B;
                             break;
                     }
-
+                    
                 }
             }
 
             return foo;
         }
 
-        public void MakeHistogramme()
+        public void MakeHistograme()
         {
+            _imageY = LibColors();
             imageR = LibColors(1);
             imageG = LibColors(2);
             imageB = LibColors(3);
 
-            CalculateHistograme(imageR, Width, Height, _histR);
-            CalculateHistograme(imageG, Width, Height, _histG);
-            CalculateHistograme(imageB, Width, Height, _histB);
+            CalculateHistograme(_imageY, Width, Height, _hist);
+
+            int max = _hist.Max();
+            int maxI = -1;
+            int min = 0;
+            int minI = -1;
+
+            for (int i = 0; i < 256; i++)
+            {
+                if (_hist[i] == max && maxI == -1)
+                {
+                    maxI = i;
+                }
+                if ((_hist[i] > 0 && min > _hist[i]) || minI == -1)
+                {
+                    min = _hist[i];
+                    minI = i;
+                }
+            }
+
+            int diff = maxI - minI;
+
+            for (int i = 0; i < 256; i++)
+            {
+                _hist[i] = (int) (255 * (_hist[i] - minI) / diff);
+
+                if (_hist[i] < 0) _hist[i] = 0;
+                if (_hist[i] > 255) _hist[i] = 255;
+            }
         }
 
         public void Normalize()
         {
-            Normalize(imageR, Width, Height, _histR.Max(), _histR.Min());
-            Normalize(imageG, Width, Height, _histG.Max(), _histG.Min());
-            Normalize(imageB, Width, Height, _histB.Max(), _histB.Min());
+            Normalize(imageR, Width, Height, _hist);
+            Normalize(imageG, Width, Height, _hist);
+            Normalize(imageB, Width, Height, _hist);
 
             for (int i = 0; i < Width; i++)
             {
@@ -128,11 +159,13 @@ namespace ForTerkom
             }
         }
 
-        public ImageSource GetImageSource()
+        public ImageSource GetImageSource(Bitmap frame = null)
         {
             var stream = new MemoryStream();
-            
-            _image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+
+            var image = (frame != null) ? (frame) : (_image);
+
+            image.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
 
             var newImage = new BitmapImage();
             newImage.BeginInit();

@@ -92,7 +92,7 @@ void CalculateHistograme(int* image, int width, int height, int* res)
 	free(hist);
 }
 
-__global__ void cudaNormalize(CArray<int> image, int histMax, int histMin)
+__global__ void cudaNormalize(CArray<int> image, int* normalizeTable)
 {
 	int column = blockIdx.x * blockDim.x + threadIdx.x;
 	int row = blockIdx.y*blockDim.y + threadIdx.y;
@@ -103,25 +103,22 @@ __global__ void cudaNormalize(CArray<int> image, int histMax, int histMin)
 
 	height = image.Height;
 	width = image.Width;
-	diffHist = histMax - histMin;
 
 	if (width > column && height > row)
 	{
 		int valImg = image.At(row, column);
-		int val = valImg - histMin;
-		int div = val / diffHist;
-		image.SetAt(row, column, 255 * div);
+		image.SetAt(row, column, normalizeTable[valImg]);
 	}
 }
 
-void Normalize(int* image, int width, int height, int histMax, int histMin)
+void Normalize(int* image, int width, int height, int* normalizeTable)
 {
 	CArray<int> source = CArray<int>(image, width, height);
 
 	dim3 blockSize = dim3(32);
 	dim3 gridSize = dim3((height + 31) / 32);
 
-	cudaNormalize << <gridSize, blockSize >> > (source, histMax, histMin);
+	cudaNormalize << <gridSize, blockSize >> > (source, normalizeTable);
 
 	source.GetData(image);
 }

@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using MediaToolkit;
+using MediaToolkit.Model;
+using MediaToolkit.Options;
 using Microsoft.Win32;
 
 
@@ -17,6 +21,8 @@ namespace ForTerkom
     {
         private bool _firstPlay;
         private ImageExtensions _imageExt;
+
+        private MediaFile inputFile;
 
         public MainWindow()
         {
@@ -40,7 +46,11 @@ namespace ForTerkom
                 {
                     Screen.Source = new Uri(openFile.FileName);
                     Screen.LoadedBehavior = MediaState.Pause;
+
+                    inputFile = new MediaFile {Filename = openFile.FileName};
                 }
+
+ 
 
                 _firstPlay = true;
             }
@@ -82,9 +92,49 @@ namespace ForTerkom
             _imageExt.ToBitmapImage(Screen);
 
             ImageItem.Source = _imageExt.GetImageSource();
+
+            var time = Screen.Position;
+
+            var foo = new MediaFile {Filename = "Hist.bmp"};
+
+            if (File.Exists("Hist.bmp"))
+            {
+                File.Delete("Hist.bmp");
+            }
+
+            using (var engine = new Engine())
+            {
+                engine.GetMetadata(inputFile);
+
+
+                var options = new ConversionOptions {Seek = TimeSpan.FromMilliseconds(time.Milliseconds)};
+                engine.GetThumbnail(inputFile, foo, options);
+            }
         }
 
         
+
+        //private void NormalizeButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (ImageItem.Source == null)
+        //    {
+        //        MessageBox.Show("Click \"Get Image\"");
+        //        return;
+        //    }
+        //    try
+        //    {
+        //        _imageExt.MakeHistogramme();
+        //        _imageExt.Normalize();
+        //        ImageItem.Source = _imageExt.GetImageSource();
+
+               
+        //    }
+        //    catch (Exception)
+        //    {
+        //        MessageBox.Show("Failed normalize");
+        //    }
+
+        //}
 
         private void NormalizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -95,29 +145,8 @@ namespace ForTerkom
             }
             try
             {
-                _imageExt.MakeHistogramme();
-                _imageExt.Normalize();
-                ImageItem.Source = _imageExt.GetImageSource();
-
                 
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Failed normalize");
-            }
 
-        }
-
-        private void MakeHistButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (ImageItem.Source == null)
-            {
-                MessageBox.Show("Click \"Get Image\"");
-                return;
-            }
-            try
-            {
-                _imageExt.MakeHistogramme();
             }
             catch (Exception)
             {
