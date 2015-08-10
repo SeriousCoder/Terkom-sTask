@@ -147,6 +147,7 @@ namespace ForTerkom
             {
                 _imageExt.MakeHistograme();
 
+                //Add normalization for all frames
             }
             catch (Exception)
             {
