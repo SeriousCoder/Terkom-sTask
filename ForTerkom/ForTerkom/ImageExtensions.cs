@@ -25,9 +25,6 @@ namespace ForTerkom
         int[] _hist = new int[256];
         private int[,] _imageY;
 
-        private int[,] imageR;
-        private int[,] imageG;
-        private int[,] imageB;
 
         int Width
         {
@@ -105,9 +102,7 @@ namespace ForTerkom
         public void MakeHistograme()
         {
             _imageY = LibColors();
-            imageR = LibColors(1);
-            imageG = LibColors(2);
-            imageB = LibColors(3);
+            
 
             CalculateHistograme(_imageY, Width, Height, _hist);
 
@@ -140,21 +135,30 @@ namespace ForTerkom
             }
         }
 
-        public void Normalize()
+        public void Normalize(int frames)
         {
-            Normalize(imageR, Width, Height, _hist);
-            Normalize(imageG, Width, Height, _hist);
-            Normalize(imageB, Width, Height, _hist);
-
-            for (int i = 0; i < Width; i++)
+            for (int q = 0; q < frames; q++)
             {
-                for (int j = 0; j < Height; j++)
-                {
-                    int r = imageR[i, j];
-                    int g = imageG[i, j];
-                    int b = imageB[i, j];
+                _image = new Bitmap(frames.ToString() + ".bmp");
 
-                    _image.SetPixel(i, j, Color.FromArgb(r, g, b));
+                int[,] imageR = LibColors(1);
+                int[,] imageG = LibColors(2);
+                int[,] imageB = LibColors(3);
+
+                Normalize(imageR, Width, Height, _hist);
+                Normalize(imageG, Width, Height, _hist);
+                Normalize(imageB, Width, Height, _hist);
+
+                for (int i = 0; i < Width; i++)
+                {
+                    for (int j = 0; j < Height; j++)
+                    {
+                        int r = imageR[i, j];
+                        int g = imageG[i, j];
+                        int b = imageB[i, j];
+
+                        _image.SetPixel(i, j, Color.FromArgb(r, g, b));
+                    }
                 }
             }
         }
